@@ -1,5 +1,6 @@
 ﻿using Hospital_Management_System.Dtos.Departments;
 using Hospital_Management_System.Repositories.Interfaces;
+using Hospital_Management_System.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,55 +12,39 @@ namespace Hospital_Management_System.Controllers
     public class DepartmentsController : ControllerBase
     {
         private readonly IDepartmentRepository _repository;
+        private readonly IDepartmentServices _service;
 
-        public DepartmentsController(IDepartmentRepository repository)
+        public DepartmentsController(IDepartmentRepository repository, IDepartmentServices service)
         {
             _repository = repository;
+            _service = service;
         }
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _repository.GetAll());
+            return Ok(await _service.GetAllAsync());
         }
         [HttpGet("{id}")]
         //[Route("{id}")]
 
         public async Task<IActionResult> Get(int id)
         {
-            if (id <= 0)
-            {
-                //return BadRequest();
-                return StatusCode(StatusCodes.Status400BadRequest);
-            }
-            Department department = await _repository.GetByIdAsync(id);
-            
-            if(department is null) 
-            { 
-                //return NotFound();
-                return StatusCode(StatusCodes.Status404NotFound);
-            }
-            return Ok(department);
+            if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
+            return Ok(await _repository.GetByIdAsync(id));
         }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromForm]CreateDepartmentDto departmentDto)
         {
-            Department department = new Department { Name = departmentDto.Name };
-            await _repository.AddAsync(department);
-            await _repository.SaveChangeAsync();
-            return StatusCode(StatusCodes.Status201Created, department);
+            await _service.CreateAsync(departmentDto);
+            return StatusCode(StatusCodes.Status201Created);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromForm] UpdateDepartmentDto departmentDto)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-            Department existed = await _repository.GetByIdAsync(id);
-
-            if (existed is null) return StatusCode(StatusCodes.Status404NotFound);
-            existed.Name = departmentDto.Name;
-            _repository.Update(existed);
-            await _repository.SaveChangeAsync();
+            await _service.UpdateAsync(id, departmentDto);
             return NoContent();
         }
         [HttpDelete("{id}")]

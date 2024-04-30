@@ -18,7 +18,7 @@ namespace Hospital_Management_System.Repositories.Implementations
             _table = context.Set<T>();
         }
 
-        public async Task<IQueryable<T>> GetAll(Expression<Func<T,bool>>? expression=null)
+        public IQueryable<T> GetAll(Expression<Func<T,bool>>? expression=null)
         {
             IQueryable<T> query = _table;
             if(expression != null) query = query.Where(expression);

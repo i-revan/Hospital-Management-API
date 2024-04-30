@@ -6,7 +6,7 @@ namespace Hospital_Management_System.Repositories.Interfaces
 {
     public interface IRepository<T> where T : BaseEntity
     {
-        Task<IQueryable<T>> GetAll(Expression<Func<T, bool>>? expression = null);
+        IQueryable<T> GetAll(Expression<Func<T, bool>>? expression = null);
         Task<T> GetByIdAsync(int id);
         Task AddAsync(T entity);
         void Update(T entity);
