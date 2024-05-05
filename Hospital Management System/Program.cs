@@ -25,7 +25,9 @@ namespace Hospital_Management_System
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddCors(options => options.AddDefaultPolicy(policy => 
+                policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()
+                ));
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -34,7 +36,7 @@ namespace Hospital_Management_System
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseCors();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
