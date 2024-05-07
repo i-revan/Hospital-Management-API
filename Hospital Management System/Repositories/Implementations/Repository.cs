@@ -25,11 +25,19 @@ namespace Hospital_Management_System.Repositories.Implementations
             return query;
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
         {
-            T entity = await _table.FirstOrDefaultAsync(e => e.Id == id);
+            var query = _table.AsQueryable();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            T entity = await query.FirstOrDefaultAsync(e => e.Id == id);
             return entity;
         }
+
 
         public async Task AddAsync(T entity)
         {

@@ -13,16 +13,17 @@ namespace Hospital_Management_System.Service.Implementations
             _repository = repository;
         }
 
-        public async Task<ICollection<GetDepartmentDto>> GetAllAsync()
+        public async Task<ICollection<GetAllDepartmentsDto>> GetAllAsync()
         {
-            ICollection<Department> departments = await _repository.GetAll().ToListAsync();
-            ICollection<GetDepartmentDto> dtos = new List<GetDepartmentDto>();
+            ICollection<Department> departments = await _repository.GetAll().Include(d => d.Doctors).ToListAsync();
+            ICollection<GetAllDepartmentsDto> dtos = new List<GetAllDepartmentsDto>();
             foreach (Department department in departments)
             {
-                dtos.Add(new GetDepartmentDto
+                dtos.Add(new GetAllDepartmentsDto
                 {
                     Id = department.Id,
-                    Name = department.Name
+                    Name = department.Name,
+                    DoctorsNumber = department.Doctors.Count
                 });
             }
             return dtos;

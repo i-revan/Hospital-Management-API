@@ -21,6 +21,8 @@ namespace Hospital_Management_System
             });
             builder.Services.AddScoped<IDepartmentRepository,DepartmentRepository>();
             builder.Services.AddScoped<IDepartmentServices,DepartmentServices>();
+            builder.Services.AddScoped<IDoctorRepository,DoctorRepository>();
+            builder.Services.AddScoped<IDoctorServices,DoctorServices>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
