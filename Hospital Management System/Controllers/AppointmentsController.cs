@@ -1,6 +1,5 @@
-﻿using Hospital_Management_System.Dtos.Doctors;
-using Hospital_Management_System.Entities;
-using Hospital_Management_System.Repositories.Implementations;
+﻿using Hospital_Management_System.Dtos.Appointments;
+using Hospital_Management_System.Dtos.Doctors;
 using Hospital_Management_System.Repositories.Interfaces;
 using Hospital_Management_System.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -10,16 +9,17 @@ namespace Hospital_Management_System.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class DoctorsController : ControllerBase
+    public class AppointmentsController : ControllerBase
     {
-        private readonly IDoctorRepository _repository;
-        private readonly IDoctorServices _service;
+        private readonly IAppointmentRepository _repository;
+        private readonly IAppointmentServices _service;
 
-        public DoctorsController(IDoctorRepository repository, IDoctorServices service)
+        public AppointmentsController(IAppointmentRepository repository,IAppointmentServices service)
         {
             _repository = repository;
             _service = service;
         }
+
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -30,42 +30,38 @@ namespace Hospital_Management_System.Controllers
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-            Doctor doctor = await _repository.GetByIdAsync(id, d=>d.Department);
-            GetDoctorDto doctorDetailsDto = new GetDoctorDto
+            Appointment appointment = await _repository.GetByIdAsync(id, a=> a.Patient, a=>a.Doctor);
+            GetAppointmentDto appointmentDto = new GetAppointmentDto
             {
-                Id = doctor.Id,
-                Name = doctor.Name,
-                Surname = doctor.Surname,
-                Address = doctor.Address,
-                IsAvailable = doctor.IsAvailable,
-                department = doctor.Department.Name // Access the department name from the related Department entity
+                Id = appointment.Id,
+                Patient = appointment.Patient.Name + appointment.Patient.Surname,
+                Doctor = appointment.Doctor.Name + appointment.Doctor.Surname
             };
-            return Ok(doctorDetailsDto);
+            return Ok(appointmentDto);
         }
-
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] CreateDoctorDto doctorDto)
+        public async Task<IActionResult> Post([FromForm] CreateAppointmentDto appointmentDto)
         {
-            await _service.CreateAsync(doctorDto);
+            await _service.CreateAsync(appointmentDto);
             return StatusCode(StatusCodes.Status201Created);
         }
-
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromForm] UpdateDoctorDto doctorDto)
+        public async Task<IActionResult> Put(int id, [FromForm] UpdateAppointmentDto dto)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-            await _service.UpdateAsync(id, doctorDto);
+            await _service.UpdateAsync(id, dto);
             return NoContent();
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-            Doctor existed = await _repository.GetByIdAsync(id);
+            Appointment existed = await _repository.GetByIdAsync(id);
             if (existed is null) return StatusCode(StatusCodes.Status404NotFound);
             _repository.Delete(existed);
             await _repository.SaveChangeAsync();
             return NoContent();
         }
+
     }
 }
