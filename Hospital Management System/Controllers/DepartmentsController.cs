@@ -1,11 +1,6 @@
-﻿using Hospital_Management_System.Dtos.Departments;
-using Hospital_Management_System.Dtos.Doctors;
-using Hospital_Management_System.Entities;
-using Hospital_Management_System.Repositories.Interfaces;
+﻿using Hospital_Management_System.Repositories.Interfaces;
 using Hospital_Management_System.Service.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hospital_Management_System.Controllers
 {
@@ -32,14 +27,7 @@ namespace Hospital_Management_System.Controllers
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-            Department department = await _repository.GetByIdAsync(id, d => d.Doctors);
-            GetDepartmentDto departmentDto = new GetDepartmentDto
-            {
-                Id = department.Id,
-                Name = department.Name,
-                Doctors = department.Doctors
-            };
-
+            GetDepartmentDto departmentDto = await _service.GetByIdAsync(id);
             return Ok(departmentDto);
         }
 

@@ -1,4 +1,5 @@
-﻿using Hospital_Management_System.Dtos.Appointments;
+﻿using AutoMapper;
+using Hospital_Management_System.Dtos.Appointments;
 using Hospital_Management_System.Dtos.Doctors;
 using Hospital_Management_System.Repositories.Implementations;
 using Hospital_Management_System.Repositories.Interfaces;
@@ -11,11 +12,13 @@ namespace Hospital_Management_System.Service.Implementations
     {
         private readonly IAppointmentRepository _repository;
         private readonly IDoctorRepository _doctorRepository;
+        private readonly IMapper _mapper;
 
-        public AppointmentServices(IAppointmentRepository repository, IDoctorRepository doctorRepository)
+        public AppointmentServices(IAppointmentRepository repository, IDoctorRepository doctorRepository,IMapper mapper)
         {
             _repository = repository;
             _doctorRepository = doctorRepository;
+            _mapper = mapper;
         }
         public async Task<ICollection<GetAllAppointmentsDto>> GetAllAsync()
         {
@@ -24,26 +27,22 @@ namespace Hospital_Management_System.Service.Implementations
             ICollection<GetAllAppointmentsDto> dtos = new List<GetAllAppointmentsDto>();
             foreach (Appointment appointment in appointments)
             {
-                dtos.Add(new GetAllAppointmentsDto
-                {
-                    Patient = appointment.Patient.Name +" " + appointment.Patient.Surname,
-                    Doctor = appointment.Doctor.Name + " " + appointment.Doctor.Surname
-                });
+                GetAllAppointmentsDto dto = new GetAllAppointmentsDto();
+                dto.Patient = appointment.Patient.Name + " " + appointment.Patient.Surname;
+                dto.Doctor = appointment.Doctor.Name + " " + appointment.Doctor.Surname;
+                dtos.Add(dto);
             }
             return dtos;
         }
 
         public async Task<GetAppointmentDto> GetByIdAsync(int id)
         {
-            Appointment appointment = await _repository.GetByIdAsync(id, a => a.Doctor, a => a.Patient);            if (appointment is null) throw new Exception("Not found");
-            return new GetAppointmentDto
-            {
-                Id = id,
-                Patient = appointment.Patient.Name + " " + appointment.Patient.Surname,
-                Doctor = appointment.Doctor.Name + " " + appointment.Doctor.Surname,
-                Start = appointment.Start,
-                End = appointment.End
-            };
+            Appointment appointment = await _repository.GetByIdAsync(id, a => a.Doctor, a => a.Patient);            
+            if (appointment is null) throw new Exception("Not found");
+            GetAppointmentDto dto = _mapper.Map<GetAppointmentDto>(appointment);
+            dto.Patient = appointment.Patient.Name + " " + appointment.Patient.Surname;
+            dto.Doctor = appointment.Doctor.Name + " " + appointment.Doctor.Surname;
+            return dto;
         }
 
         public async Task CreateAsync(CreateAppointmentDto dto)
@@ -53,8 +52,6 @@ namespace Hospital_Management_System.Service.Implementations
                 throw new Exception("Appointment must be scheduled between 08:00 and 20:00.");
             }
             Doctor doctor = await _doctorRepository.GetByIdAsync(dto.DoctorId);
-
-            // Check if the doctor is available
             if (!doctor.IsAvailable)
             {
                 throw new Exception("Doctor is not available!");
@@ -71,7 +68,7 @@ namespace Hospital_Management_System.Service.Implementations
                     }
                 }
             }
-            Appointment newAppointment = new Appointment { DoctorId = dto.DoctorId, PatientId = dto.PatientId, Start = dto.Start, End = dto.End };
+            Appointment newAppointment = _mapper.Map<Appointment>(dto);
             await _repository.AddAsync(newAppointment);
             await _repository.SaveChangeAsync();
         }
@@ -80,10 +77,7 @@ namespace Hospital_Management_System.Service.Implementations
         {
             Appointment appointment = await _repository.GetByIdAsync(id);
             if (appointment is null) throw new Exception("Not found");
-            appointment.DoctorId = dto.DoctorId;
-            appointment.PatientId = dto.PatientId;
-            appointment.Start = dto.Start;
-            appointment.End = dto.End;
+            _mapper.Map(dto, appointment);
             _repository.Update(appointment);
             await _repository.SaveChangeAsync();
             return dto;

@@ -1,5 +1,5 @@
-﻿using Hospital_Management_System.Dtos.Doctors;
-using Hospital_Management_System.Entities;
+﻿using AutoMapper;
+using Hospital_Management_System.Dtos.Doctors;
 using Hospital_Management_System.Repositories.Interfaces;
 using Hospital_Management_System.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -9,57 +9,48 @@ namespace Hospital_Management_System.Service.Implementations
     public class DoctorServices : IDoctorServices
     {
         private readonly IDoctorRepository _repository;
+        private readonly IMapper _mapper;
 
-        
-        public DoctorServices(IDoctorRepository repository)
+        public DoctorServices(IDoctorRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
-        public async Task<ICollection<GetDoctorDto>> GetAllAsync()
+        public async Task<ICollection<GetAllDoctorsDto>> GetAllAsync()
         {
             ICollection<Doctor> doctors = await _repository.GetAll().Include(d=>d.Department).ToListAsync();
-            ICollection<GetDoctorDto> dtos = new List<GetDoctorDto>();
+            ICollection<GetAllDoctorsDto> dtos = new List<GetAllDoctorsDto>();
             foreach (Doctor doctor in doctors)
             {
-                dtos.Add(new GetDoctorDto
-                {
-                    Id = doctor.Id,
-                    Name = doctor.Name,
-                    Surname = doctor.Surname,
-                    Address = doctor.Address,
-                    IsAvailable = doctor.IsAvailable,
-                    department = doctor.Department.Name
-                });
+                GetAllDoctorsDto dto = _mapper.Map<GetAllDoctorsDto>(doctor);
+                dto.department = doctor.Department.Name;
+                dtos.Add(dto);
             }
             return dtos;
         }
 
         public async Task<GetDoctorDto> GetByIdAsync(int id)
         {
-            Doctor doctor = await _repository.GetByIdAsync(id, d => d.Department);
+            Doctor doctor = await _repository.GetByIdAsync(id, d => d.Department,d=>d.Appointments);
             if (doctor is null) throw new Exception("Not found");
-            return new GetDoctorDto { Id = id, Name = doctor.Name , Surname = doctor.Surname, 
-                Address = doctor.Address, department = doctor.Department.Name};
+            GetDoctorDto dto = _mapper.Map<GetDoctorDto>(doctor);
+            dto.department = doctor.Department.Name;
+            return dto;
         }
 
         public async Task CreateAsync(CreateDoctorDto dto)
         {
-            await _repository.AddAsync(new Doctor { Name = dto.Name, Surname = dto.Surname, Address = dto.Address, IsAvailable = true,DepartmentId = dto.DepartmentId});
+            Doctor doctor = _mapper.Map<Doctor>(dto);
+            await _repository.AddAsync(doctor);
             await _repository.SaveChangeAsync();
         }
-
-
 
         public async Task<UpdateDoctorDto> UpdateAsync(int id, UpdateDoctorDto dto)
         {
             Doctor doctor = await _repository.GetByIdAsync(id);
             if (doctor is null) throw new Exception("Not found");
-            doctor.Name = dto.Name;
-            doctor.Surname = dto.Surname;
-            doctor.Address = dto.Address;
-            doctor.IsAvailable = dto.IsAvailable;
-            doctor.DepartmentId = dto.DepartmentId;
+            _mapper.Map(dto, doctor);
             _repository.Update(doctor);
             await _repository.SaveChangeAsync();
             return dto;

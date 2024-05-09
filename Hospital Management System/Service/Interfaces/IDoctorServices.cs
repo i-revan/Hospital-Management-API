@@ -4,7 +4,7 @@ namespace Hospital_Management_System.Service.Interfaces
 {
     public interface IDoctorServices
     {
-        Task<ICollection<GetDoctorDto>> GetAllAsync();
+        Task<ICollection<GetAllDoctorsDto>> GetAllAsync();
         Task<GetDoctorDto> GetByIdAsync(int id);
         Task CreateAsync(CreateDoctorDto dto);
         Task<UpdateDoctorDto> UpdateAsync(int id, UpdateDoctorDto dto);

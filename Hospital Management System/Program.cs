@@ -1,5 +1,4 @@
-
-using Hospital_Management_System.DAL;
+using Hospital_Management_System.Mapper;
 using Hospital_Management_System.Repositories.Implementations;
 using Hospital_Management_System.Repositories.Interfaces;
 using Hospital_Management_System.Service.Implementations;
@@ -19,6 +18,8 @@ namespace Hospital_Management_System
             {
                 opt.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
             });
+            builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
+
             builder.Services.AddScoped<IDepartmentRepository,DepartmentRepository>();
             builder.Services.AddScoped<IDepartmentServices,DepartmentServices>();
             builder.Services.AddScoped<IDoctorRepository,DoctorRepository>();

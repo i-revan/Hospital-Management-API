@@ -135,3 +135,4 @@ C:\Users\rvani\Desktop\ConsoleApps\Hospital Management System\Hospital Managemen
 C:\Users\rvani\Desktop\ConsoleApps\Hospital Management System\Hospital Management System\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\rvani\Desktop\ConsoleApps\Hospital Management System\Hospital Management System\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 C:\Users\rvani\Desktop\ConsoleApps\Hospital Management System\Hospital Management System\obj\Debug\net8.0\Hospital Management System.sourcelink.json
+C:\Users\rvani\Desktop\ConsoleApps\Hospital Management System\Hospital Management System\bin\Debug\net8.0\AutoMapper.dll

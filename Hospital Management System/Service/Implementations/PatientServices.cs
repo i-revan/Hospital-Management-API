@@ -1,4 +1,5 @@
-﻿using Hospital_Management_System.Dtos.Patients;
+﻿using AutoMapper;
+using Hospital_Management_System.Dtos.Patients;
 using Hospital_Management_System.Entities;
 using Hospital_Management_System.Repositories.Interfaces;
 using Hospital_Management_System.Service.Interfaces;
@@ -9,12 +10,13 @@ namespace Hospital_Management_System.Service.Implementations
     public class PatientServices : IPatientServices
     {
         private readonly IPatientRepository _repository;
+        private readonly IMapper _mapper;
 
-        public PatientServices(IPatientRepository repository)
+        public PatientServices(IPatientRepository repository,IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
-
 
         public async Task<ICollection<GetAllPatientsDto>> GetAllAsync()
         {
@@ -22,12 +24,8 @@ namespace Hospital_Management_System.Service.Implementations
             ICollection<GetAllPatientsDto> dtos = new List<GetAllPatientsDto>();
             foreach (Patient patient in patients)
             {
-                dtos.Add(new GetAllPatientsDto
-                {
-                    Id = patient.Id,
-                    Name = patient.Name,
-                    Surname = patient.Surname
-                });
+                GetAllPatientsDto dto = _mapper.Map<GetAllPatientsDto>(patient);
+                dtos.Add(dto);
             }
             return dtos;
         }
@@ -36,20 +34,14 @@ namespace Hospital_Management_System.Service.Implementations
         {
             Patient patient = await _repository.GetByIdAsync(id, p=>p.Appointments);
             if (patient is null) throw new Exception("Not found");
-            return new GetPatientDto
-            {
-                Id = id,
-                Name = patient.Name,
-                Surname = patient.Surname,
-                Address = patient.Address,
-                Age = patient.Age,
-                Appointments = patient.Appointments
-            };
+            GetPatientDto dto = _mapper.Map<GetPatientDto>(patient);
+            return dto;
         }
 
         public async Task CreateAsync(CreatePatientDto dto)
         {
-            await _repository.AddAsync(new Patient { Name = dto.Name, Surname = dto.Surname, Address = dto.Address, Age = dto.Age });
+            Patient patient = _mapper.Map<Patient>(dto);
+            await _repository.AddAsync(patient);
             await _repository.SaveChangeAsync();
         }
 
@@ -58,10 +50,7 @@ namespace Hospital_Management_System.Service.Implementations
         {
             Patient patient = await _repository.GetByIdAsync(id);
             if (patient is null) throw new Exception("Not found");
-            patient.Name = dto.Name;
-            patient.Surname = dto.Surname;
-            patient.Address = dto.Address;
-            patient.Age = dto.Age;
+            _mapper.Map(dto, patient);
             _repository.Update(patient);
             await _repository.SaveChangeAsync();
             return dto;

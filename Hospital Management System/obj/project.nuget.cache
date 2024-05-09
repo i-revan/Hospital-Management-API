@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "FuY3KQil/WbapHMkyCZSlo3lBvp2G9o1zttQRUv+PJYYudxLJYzwWO/pQcNX/DLs2V1MmYn+r5fcMXp4jD0gVA==",
+  "dgSpecHash": "rhnug+cEgopwEcuPVYov/dHLKpIcioLid+YesvsknqIEYk0dykLRcpYaxuMd5c7x3lRbmwUL2al3ckUCtlGKlg==",
   "success": true,
   "projectFilePath": "C:\\Users\\rvani\\Desktop\\ConsoleApps\\Hospital Management System\\Hospital Management System\\Hospital Management System.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\rvani\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\rvani\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\rvani\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
     "C:\\Users\\rvani\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
