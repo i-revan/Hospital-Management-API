@@ -48,7 +48,7 @@ namespace Hospital_Management_System.Controllers
             return StatusCode(StatusCodes.Status201Created);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromForm] UpdatePatientDto patientDto)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
@@ -56,7 +56,7 @@ namespace Hospital_Management_System.Controllers
             return NoContent();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
