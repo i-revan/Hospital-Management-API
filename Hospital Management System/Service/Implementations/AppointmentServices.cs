@@ -35,13 +35,12 @@ namespace Hospital_Management_System.Service.Implementations
 
         public async Task<GetAppointmentDto> GetByIdAsync(int id)
         {
-            Appointment appointment = await _repository.GetByIdAsync(id, a => a.Doctor, a => a.Patient);
-            if (appointment is null) throw new Exception("Not found");
+            Appointment appointment = await _repository.GetByIdAsync(id, a => a.Doctor, a => a.Patient);            if (appointment is null) throw new Exception("Not found");
             return new GetAppointmentDto
             {
                 Id = id,
-                Patient = appointment.Patient.Name + appointment.Patient.Surname,
-                Doctor = appointment.Doctor.Name + appointment.Patient.Surname,
+                Patient = appointment.Patient.Name + " " + appointment.Patient.Surname,
+                Doctor = appointment.Doctor.Name + " " + appointment.Doctor.Surname,
                 Start = appointment.Start,
                 End = appointment.End
             };
@@ -62,16 +61,18 @@ namespace Hospital_Management_System.Service.Implementations
             }
 
             // Check for overlapping appointments
-            foreach (Appointment appointment in doctor.Appointments)
+            if (doctor.Appointments != null)
             {
-                if (dto.Start < appointment.End && dto.End > appointment.Start)
+                foreach (Appointment appointment in doctor.Appointments)
                 {
-                    throw new Exception("Appointment time conflicts with existing appointment.");
+                    if (dto.Start < appointment.End && dto.End > appointment.Start)
+                    {
+                        throw new Exception("Appointment time conflicts with existing appointment.");
+                    }
                 }
             }
-
-            // Create the appointment
-            await _repository.AddAsync(new Appointment { DoctorId = dto.DoctorId, PatientId = dto.PatientId, Start = dto.Start, End = dto.End });
+            Appointment newAppointment = new Appointment { DoctorId = dto.DoctorId, PatientId = dto.PatientId, Start = dto.Start, End = dto.End };
+            await _repository.AddAsync(newAppointment);
             await _repository.SaveChangeAsync();
         }
 

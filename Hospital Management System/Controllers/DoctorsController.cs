@@ -30,7 +30,7 @@ namespace Hospital_Management_System.Controllers
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-            Doctor doctor = await _repository.GetByIdAsync(id, d=>d.Department);
+            Doctor doctor = await _repository.GetByIdAsync(id, d=>d.Department, d=>d.Appointments);
             GetDoctorDto doctorDetailsDto = new GetDoctorDto
             {
                 Id = doctor.Id,
@@ -38,7 +38,8 @@ namespace Hospital_Management_System.Controllers
                 Surname = doctor.Surname,
                 Address = doctor.Address,
                 IsAvailable = doctor.IsAvailable,
-                department = doctor.Department.Name // Access the department name from the related Department entity
+                department = doctor.Department.Name,
+                Appointments = doctor.Appointments
             };
             return Ok(doctorDetailsDto);
         }

@@ -8,5 +8,6 @@
         public string Address { get; set; }
         public bool IsAvailable { get; set; }
         public string department { get; set; }
+        public ICollection<Appointment> Appointments { get; set; }
     }
 }

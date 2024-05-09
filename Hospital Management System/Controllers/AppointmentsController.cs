@@ -30,14 +30,8 @@ namespace Hospital_Management_System.Controllers
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-            Appointment appointment = await _repository.GetByIdAsync(id, a=> a.Patient, a=>a.Doctor);
-            GetAppointmentDto appointmentDto = new GetAppointmentDto
-            {
-                Id = appointment.Id,
-                Patient = appointment.Patient.Name + appointment.Patient.Surname,
-                Doctor = appointment.Doctor.Name + appointment.Doctor.Surname
-            };
-            return Ok(appointmentDto);
+            GetAppointmentDto dto = await _service.GetByIdAsync(id);
+            return Ok(dto);
         }
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] CreateAppointmentDto appointmentDto)
